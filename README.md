@@ -14,6 +14,27 @@ The gateway buffers tokens from upstream providers and streams them to users at 
 
 ---
 
+## Upstream Models
+
+| Model | Provider | Speed | Best For |
+|-------|----------|-------|----------|
+| `deepseek-v4-flash` | DeepSeek | Fast | Quick tasks, chat |
+| `deepseek-v4-pro` | DeepSeek | Medium | Complex reasoning |
+| `kimi-k2.6` | Moonshot | Fast | General use |
+| `kimi-k3` | Moonshot | Medium | Advanced tasks |
+
+---
+
+## Subscription Tiers
+
+| Tier | TPS | Duration |
+|------|-----|----------|
+| Standard | 15 | 30 days |
+| Premium | 30 | 30 days |
+| Ultra | 45 | 30 days |
+
+---
+
 ## User Setup
 
 ### Create a User Key
@@ -30,7 +51,7 @@ curl -X POST http://YOUR_SERVER:4000/key/generate \
     "tpm_limit": 900,
     "rpm_limit": 5,
     "duration": "30d",
-    "max_budget": 20.0,
+    "max_budget": 10.0,
     "budget_duration": "30d",
     "max_parallel_requests": 1
   }'
@@ -57,22 +78,11 @@ client = openai.OpenAI(
 
 # Streams at exactly 15 tokens/second
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="deepseek-v4-flash",
     messages=[{"role": "user", "content": "Hello"}],
     stream=True
 )
 ```
-
----
-
-## Subscription Tiers
-
-| Tier | TPS | Duration | Budget | Price |
-|------|-----|----------|--------|-------|
-| Trial | 5 | 1 day | $0.50 | Free |
-| Basic | 10 | 30 days | $5 | $5/mo |
-| Pro | 25 | 30 days | $20 | $20/mo |
-| Enterprise | 100 | 365 days | $500 | $500/yr |
 
 ---
 
@@ -87,7 +97,7 @@ curl -X POST http://YOUR_SERVER:4000/key/update \
   -d '{
     "key": "sk-abc123...",
     "metadata": {
-      "tps_limit": 25
+      "tps_limit": 30
     }
   }'
 ```
@@ -138,11 +148,7 @@ curl -X POST http://YOUR_SERVER:4000/key/delete \
 
 | Format | Meaning |
 |--------|---------|
-| `1d` | 1 day |
-| `7d` | 1 week |
 | `30d` | 1 month |
-| `90d` | 3 months |
-| `365d` | 1 year |
 
 ---
 
