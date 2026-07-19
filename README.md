@@ -7,7 +7,6 @@ Throttled AI API gateway with subscription-based access control.
 Users get a **virtual API key** that controls:
 - **TPS (Tokens Per Second)** - How fast they receive tokens
 - **Duration** - When their subscription expires
-- **Max Budget** - Spending limit
 - **Max Parallel Requests** - Concurrent streams (default: 1)
 
 The gateway buffers tokens from upstream providers and streams them to users at their subscribed speed.
@@ -51,8 +50,6 @@ curl -X POST http://YOUR_SERVER:4000/key/generate \
     "tpm_limit": 900,
     "rpm_limit": 5,
     "duration": "30d",
-    "max_budget": 10.0,
-    "budget_duration": "30d",
     "max_parallel_requests": 1
   }'
 ```
@@ -111,18 +108,6 @@ curl -X POST http://YOUR_SERVER:4000/key/update \
   -d '{
     "key": "sk-abc123...",
     "duration": "60d"
-  }'
-```
-
-### Add Budget
-
-```bash
-curl -X POST http://YOUR_SERVER:4000/key/update \
-  -H "Authorization: Bearer sk-master-key" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "key": "sk-abc123...",
-    "max_budget": 50.0
   }'
 ```
 
@@ -195,8 +180,6 @@ curl -X POST http://YOUR_SERVER:4000/key/delete \
 |-----------|-------|-------------|
 | `tps_limit` | `metadata.tps_limit` | Tokens per second |
 | `duration` | top-level | Key expiration |
-| `max_budget` | top-level | Spend limit ($) |
-| `budget_duration` | top-level | Budget reset period |
 | `tpm_limit` | top-level | Tokens per minute |
 | `rpm_limit` | top-level | Requests per minute |
 | `max_parallel_requests` | top-level | Concurrent streams |
