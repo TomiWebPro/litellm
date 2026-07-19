@@ -15,12 +15,12 @@ The gateway buffers tokens from upstream providers and streams them to users at 
 
 ## Upstream Models
 
-| Model | Provider | Speed | Best For |
-|-------|----------|-------|----------|
-| `deepseek-v4-flash` | DeepSeek | Fast | Quick tasks, chat |
-| `deepseek-v4-pro` | DeepSeek | Medium | Complex reasoning |
-| `kimi-k2.6` | Moonshot | Fast | General use |
-| `kimi-k3` | Moonshot | Medium | Advanced tasks |
+| Model | Provider | Best For |
+|-------|----------|----------|
+| `deepseek-v4-flash` | DeepSeek | Quick tasks, chat |
+| `deepseek-v4-pro` | DeepSeek | Complex reasoning |
+| `kimi-k2.6` | Moonshot | General use |
+| `kimi-k3` | Moonshot | Advanced tasks |
 
 ---
 
@@ -47,8 +47,6 @@ curl -X POST http://YOUR_SERVER:4000/key/generate \
     "metadata": {
       "tps_limit": 15
     },
-    "tpm_limit": 900,
-    "rpm_limit": 5,
     "duration": "30d",
     "max_parallel_requests": 1
   }'
@@ -107,7 +105,7 @@ curl -X POST http://YOUR_SERVER:4000/key/update \
   -H "Content-Type: application/json" \
   -d '{
     "key": "sk-abc123...",
-    "duration": "60d"
+    "duration": "30d"
   }'
 ```
 
@@ -129,11 +127,9 @@ curl -X POST http://YOUR_SERVER:4000/key/delete \
 
 ---
 
-## Duration Formats
+## Duration
 
-| Format | Meaning |
-|--------|---------|
-| `30d` | 1 month |
+All subscriptions are **30 days** from activation.
 
 ---
 
@@ -143,31 +139,20 @@ curl -X POST http://YOUR_SERVER:4000/key/delete \
 ```json
 {
   "error": {
-    "message": "Subscription expired. Your key expired at 2026-08-18T00:00:00+00:00. Please renew your subscription.",
+    "message": "Subscription expired. Please renew.",
     "type": "subscription_expired",
     "code": "key_expired"
   }
 }
 ```
 
-### Concurrent Stream Limit
+### Already Streaming
 ```json
 {
   "error": {
-    "message": "User user_123 already has an active stream. Wait for it to finish before sending another request.",
+    "message": "Already have an active stream. Wait for it to finish.",
     "type": "throttler_error",
     "code": "concurrent_stream_limit"
-  }
-}
-```
-
-### Rate Limited
-```json
-{
-  "error": {
-    "message": "Rate limit reached: 900 tokens per minute",
-    "type": "rate_limit_error",
-    "code": "rate_limit_exceeded"
   }
 }
 ```
@@ -179,7 +164,5 @@ curl -X POST http://YOUR_SERVER:4000/key/delete \
 | Parameter | Where | Description |
 |-----------|-------|-------------|
 | `tps_limit` | `metadata.tps_limit` | Tokens per second |
-| `duration` | top-level | Key expiration |
-| `tpm_limit` | top-level | Tokens per minute |
-| `rpm_limit` | top-level | Requests per minute |
+| `duration` | top-level | Key expiration (always `30d`) |
 | `max_parallel_requests` | top-level | Concurrent streams |
