@@ -1037,6 +1037,7 @@ class GenerateRequestBase(LiteLLMPydanticObjectBase):
     metadata: Optional[dict] = {}
     tpm_limit: Optional[int] = None
     rpm_limit: Optional[int] = None
+    tps_limit: Optional[float] = None  # tokens per second for stream throttling
 
     budget_duration: Optional[str] = None
     budget_limits: Optional[List[BudgetLimitEntry]] = None  # multiple concurrent budget windows
@@ -2582,6 +2583,7 @@ class UserAPIKeyAuth(LiteLLM_VerificationTokenView):  # the expected response ob
     parent_otel_span: Optional[Span] = None
     rpm_limit_per_model: Optional[Dict[str, int]] = None
     tpm_limit_per_model: Optional[Dict[str, int]] = None
+    tps_limit: Optional[float] = None  # tokens per second for stream throttling
     user_tpm_limit: Optional[int] = None
     user_rpm_limit: Optional[int] = None
     user_email: Optional[str] = None

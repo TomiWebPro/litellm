@@ -1,0 +1,68 @@
+# LiteLLM Proxy Config with Stream Throttling + Subscription Expiration
+#
+# This config enables the stream_throttler hook which:
+# - Buffers tokens from upstream providers
+# - Streams them to users at a constant tokens-per-second rate
+# - Blocks concurrent streaming requests per user
+# - Checks key expiration for subscription management
+#
+# Usage:
+#   litellm --config proxy_server_config_throttled.yaml
+#
+# Key Generation with TPS limits + 30-day subscription:
+#   curl -X POST http://localhost:4000/key/generate \
+#     -H "Authorization: Bearer sk-master-key" \
+#     -H "Content-Type: application/json" \
+#     -d '{
+#       "metadata": {
+#         "user_id": "user_123",
+#         "tps_limit": 15,
+#         "max_concurrent_streams": 1
+#       },
+#       "tpm_limit": 900,
+#       "rpm_limit": 5,
+#       "duration": "30d",
+#       "max_budget": 20.0,
+#       "budget_duration": "30d"
+#     }'
+#
+# Supported duration formats:
+#   "1d"  = 1 day
+#   "7d"  = 1 week
+#   "30d" = 1 month
+#   "90d" = 3 months
+#   "365d" = 1 year
+#
+# After expiration:
+#   - Key returns HTTP 401 with "subscription_expired" error
+#   - Key remains in database but is rejected at auth time
+
+model_list:
+  - model_name: gpt-4o
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY
+
+  - model_name: claude-sonnet
+    litellm_params:
+      model: anthropic/claude-sonnet-4-20250514
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+litellm_settings:
+  # Enable the stream throttler hook
+  callbacks: litellm.proxy.hooks.stream_throttler._PROXY_StreamThrottler
+
+  # General settings
+  drop_params:
+    - response_format
+  set_verbose: false
+
+router_settings:
+  # Default: allow 1 concurrent request per key
+  # Users can override via metadata.max_concurrent_streams
+  num_retries: 3
+  retry_after: 0.5
+  timeout: 300
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
